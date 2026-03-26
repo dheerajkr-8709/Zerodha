@@ -81,18 +81,20 @@ const WatchList = () => {
           name="search"
           id="search"
           placeholder="Search eg:infy, bse, nifty fut weekly, gold mcx"
-          className="search"
+          className="search-input"
         />
         <span className="counts"> {watchlist.length} / 50</span>
       </div>
 
-      <ul className="list">
+      <ul className="watchlist-list">
         {watchlist.map((stock, index) => {
           return <WatchListItem stock={stock} key={index} />;
         })}
       </ul>
 
-      <DoughnutChart data={data} />
+      <div style={{ padding: '20px' }}>
+        <DoughnutChart data={data} title="Portfolio Exposure" />
+      </div>
     </div>
   );
 };
@@ -111,18 +113,16 @@ const WatchListItem = ({ stock }) => {
   };
 
   return (
-    <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <div className="item">
-        <p className={stock.isDown ? "down" : "up"}>{stock.name}</p>
-        <div className="itemInfo">
-          <span className="percent">{stock.percent}</span>
-          {stock.isDown ? (
-            <KeyboardArrowDown className="down" />
-          ) : (
-            <KeyboardArrowUp className="down" />
-          )}
-          <span className="price">{stock.price}</span>
-        </div>
+    <li className="watchlist-item" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div className="item-details-main">
+        <p className="item-name">{stock.name}</p>
+        <span className={`item-percent ${stock.isDown ? 'loss' : 'profit'}`}>
+          {stock.isDown ? <KeyboardArrowDown fontSize="small" /> : <KeyboardArrowUp fontSize="small" />}
+          {stock.percent}
+        </span>
+      </div>
+      <div className="item-details">
+        <span className={`item-price ${stock.isDown ? 'loss' : 'profit'}`}>{stock.price}</span>
       </div>
       {showWatchlistActions && <WatchListActions uid={stock.name} />}
     </li>
@@ -133,20 +133,28 @@ const WatchListActions = ({ uid }) => {
   const generalContext = useContext(GeneralContext);
 
   const handleBuyClick = () => {
-    generalContext.openBuyWindow(uid);
+    generalContext.openOrderWindow(uid, "BUY");
+  };
+
+  const handleSellClick = () => {
+    generalContext.openOrderWindow(uid, "SELL");
+  };
+
+  const handleAnalyticsClick = () => {
+    alert(`Showing advanced real-time analytics for ${uid}. Feature coming soon with Chart.js integration!`);
   };
 
   return (
-    <span className="actions">
-      <span>
+    <div className="watchlist-actions">
         <Tooltip
           title="Buy (B)"
           placement="top"
           arrow
           TransitionComponent={Grow}
-          onClick={handleBuyClick}
         >
-          <button className="buy">Buy</button>
+          <button className="btn btn-sm buy-btn" onClick={handleBuyClick}>
+            Buy
+          </button>
         </Tooltip>
         <Tooltip
           title="Sell (S)"
@@ -154,7 +162,7 @@ const WatchListActions = ({ uid }) => {
           arrow
           TransitionComponent={Grow}
         >
-          <button className="sell">Sell</button>
+          <button className="btn btn-sm sell-btn" onClick={handleSellClick}>Sell</button>
         </Tooltip>
         <Tooltip
           title="Analytics (A)"
@@ -162,16 +170,10 @@ const WatchListActions = ({ uid }) => {
           arrow
           TransitionComponent={Grow}
         >
-          <button className="action">
-            <BarChartOutlined className="icon" />
+          <button className="btn btn-sm btn-light" onClick={handleAnalyticsClick}>
+            <BarChartOutlined fontSize="small" />
           </button>
         </Tooltip>
-        <Tooltip title="More" placement="top" arrow TransitionComponent={Grow}>
-          <button className="action">
-            <MoreHoriz className="icon" />
-          </button>
-        </Tooltip>
-      </span>
-    </span>
+    </div>
   );
 };

@@ -1,22 +1,69 @@
 require("dotenv").config();
-
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 const { HoldingsModel } = require("./model/HoldingsModel");
-
 const { PositionsModel } = require("./model/PositionsModel");
 const { OrdersModel } = require("./model/OrdersModel");
+const { UserModel } = require("./model/UserModel");
 
 const PORT = process.env.PORT || 3002;
 const uri = process.env.MONGO_URL;
+const SECRET_KEY = process.env.SECRET_KEY || "supersecretkey";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:3001"],
+  credentials: true,
+}));
 app.use(bodyParser.json());
+app.use(cookieParser());
+
+// Auth Routes
+app.post("/signup", async (req, res) => {
+  try {
+    const { email, password, username } = req.body;
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const user = new UserModel({
+      email,
+      password: hashedPassword,
+      username,
+    });
+    await user.save();
+    res.status(201).json({ message: "User signed up successfully", success: true, user });
+  } catch (error) {
+    res.status(500).json({ message: "Error signing up: " + error.message });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+    const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
+    res.cookie("token", token, { httpOnly: true, secure: false }); // secure: true in production
+    res.status(200).json({ message: "Logged in successfully", success: true, user });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging in: " + error.message });
+  }
+});
 
 // app.get("/addHoldings", async (req, res) => {
 //   let tempHoldings = [
@@ -197,17 +244,69 @@ app.get("/allPositions", async (req, res) => {
   res.json(allPositions);
 });
 
+app.get("/allOrders", async (req, res) => {
+  let allOrders = await OrdersModel.find({});
+  res.json(allOrders);
+});
+
 app.post("/newOrder", async (req, res) => {
-  let newOrder = new OrdersModel({
-    name: req.body.name,
-    qty: req.body.qty,
-    price: req.body.price,
-    mode: req.body.mode,
-  });
+  try {
+    const { name, qty, price, mode } = req.body;
+    
+    // 1. Save the order in history
+    let newOrder = new OrdersModel({
+      name,
+      qty,
+      price,
+      mode,
+    });
+    await newOrder.save();
 
-  newOrder.save();
+    // 2. Update Holdings (to make it dynamic for user)
+    const existingHolding = await HoldingsModel.findOne({ name });
 
-  res.send("Order saved!");
+    if (mode === "BUY") {
+      if (existingHolding) {
+        // Calculate new average price: (old_total + new_total) / new_qty
+        const totalOldCost = existingHolding.qty * existingHolding.avg;
+        const totalNewCost = qty * price;
+        const newQty = existingHolding.qty + qty;
+        existingHolding.avg = (totalOldCost + totalNewCost) / newQty;
+        existingHolding.qty = newQty;
+        await existingHolding.save();
+      } else {
+        // Create new holding
+        const newHolding = new HoldingsModel({
+          name,
+          qty,
+          avg: price,
+          price, // Initial price is current price
+          net: "0.00%",
+          day: "0.00%",
+        });
+        await newHolding.save();
+      }
+    } else if (mode === "SELL") {
+      if (existingHolding) {
+        if (existingHolding.qty < qty) {
+          return res.status(400).send("Insufficient quantity to sell");
+        }
+        existingHolding.qty -= qty;
+        if (existingHolding.qty === 0) {
+          await HoldingsModel.deleteOne({ name });
+        } else {
+          await existingHolding.save();
+        }
+      } else {
+        return res.status(400).send("No holdings found for this instrument");
+      }
+    }
+
+    res.send("Order execution successful!");
+  } catch (error) {
+    console.error("Order Error:", error);
+    res.status(500).send("Error saving order: " + error.message);
+  }
 });
 
 app.listen(PORT, () => {

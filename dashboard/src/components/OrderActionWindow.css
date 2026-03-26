@@ -181,41 +181,41 @@
     background: #4184f3;
   }
   
-  /* sudo selectors */
-  .tab button::after {
-    content: "";
-    width: 100%;
-    height: 3px;
-    display: none;
-    margin-top: 10px;
-    background-color: #4184f3;
-  }
-  
-  .inputs fieldset:focus {
-    outline: none;
-    border: 0.7px solid rgb(49, 49, 49);
-    border-radius: 2px;
-  }
-  
-  .inputs fieldset input:focus {
-    outline: none;
-  }
-  
-  .inputs fieldset input:focus {
-    outline: none;
-  }
-  
-  .inputs fieldset input:disabled {
-    cursor: not-allowed;
-    background-color: transparent;
+  .btn-red {
+    background: #ff5722;
   }
   
   .btn-blue:hover {
-    background: #74a7fa;
+    background: #1e62d0;
+  }
+  
+  .btn-red:hover {
+    background: #e64a19;
   }
   
   .btn-grey:hover {
     background: #9b9b9b;
     color: #fff;
   }
-  
+
+  .order-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--text-main);
+  }
+
+  .order-window.buy .order-title {
+    color: #4184f3;
+  }
+
+  .order-window.sell .order-title {
+    color: #ff5722;
+  }
+
+  .order-window {
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    border: none;
+    height: auto !important;
+    padding-bottom: 24px;
+  }
