@@ -4,6 +4,7 @@ import axios from "axios";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -16,25 +17,37 @@ function Login() {
         password,
       }, { withCredentials: true });
       
-      console.log("Login Response Data:", data);
+      console.log("LOGIN RESPONSE RECEIVED:", data);
 
-      if (data.success) {
+      if (data && data.success) {
         setIsSuccess(true);
         setIsLoading(false);
-        // Delay slightly for visual feedback then redirect
-        setTimeout(() => {
-           const dashboardUrl = `http://localhost:3001/?username=${encodeURIComponent(data.user.username)}`;
-           console.log("Redirecting to:", dashboardUrl);
-           window.location.replace(dashboardUrl);
-        }, 1000);
+        
+        // Extract username safely
+        const userDisplayName = (data.user && data.user.username) ? data.user.username : email.split('@')[0];
+        setUsername(userDisplayName);
+
+        // Intelligent Port Sensing: 
+        // If frontend is on 3000, dashboard is 3001. If frontend is on 3001, dashboard is 3000.
+        const currentPort = window.location.port;
+        const targetPort = currentPort === "3000" ? "3001" : "3000";
+        const dashboardUrl = `http://localhost:${targetPort}/?username=${encodeURIComponent(userDisplayName)}`;
+        
+        // Show success alert BEFORE redirect to confirm data is correct
+        alert(`Login Successful! Detected Dashboard at port ${targetPort}. Redirecting now...`);
+        
+        console.log("KICKING OFF SMART REDIRECT FROM PORT", currentPort, "TO", targetPort);
+        window.location.href = dashboardUrl;
       } else {
         setIsLoading(false);
-        alert("Login failed - check your credentials");
+        const failMsg = data?.message || "Login failed - check your credentials";
+        alert("Login Failed: " + failMsg);
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Login Error:", error);
-      alert(error.response?.data?.message || "Login failed - check your credentials");
+      console.error("AXIOS LOGIN ERROR:", error);
+      const errorMsg = error.response?.data?.message || error.message || "Unknown communication error";
+      alert("Network/Server Error: " + errorMsg);
     }
   };
 
@@ -50,9 +63,14 @@ function Login() {
         </div>
         <div className="col-lg-5 col-md-12 p-5 mt-4">
           <h1 className="mt-5 fs-2">{isSuccess ? "Welcome back!" : "Login"}</h1>
-          <p className="text-muted fs-6 mb-4">
-            {isSuccess ? "Redirecting to your dashboard..." : "Login to your Zerodha account to continue."}
-          </p>
+          {isSuccess ? (
+            <div className="alert alert-success">
+              <p className="mb-0">Logged in successfully! Redirecting to your dashboard...</p>
+              <a href={`http://localhost:3001/?username=${encodeURIComponent(username)}`} className="btn btn-link p-0">Click here if not redirected</a>
+            </div>
+          ) : (
+            <p className="text-muted fs-6 mb-4">Login to your Zerodha account to continue.</p>
+          )}
           <form onSubmit={handleLogin}>
             <div className="mb-3">
               <input
