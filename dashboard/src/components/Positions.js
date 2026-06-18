@@ -9,6 +9,8 @@ const Positions = () => {
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"}/allPositions`).then((res) => {
       setAllPositions(res.data);
+    }).catch((err) => {
+      console.error("Error fetching positions:", err);
     });
   }, []);
 

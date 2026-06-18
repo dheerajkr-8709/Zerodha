@@ -15,9 +15,49 @@ const UserSchema = new Schema({
     type: String,
     required: [true, "Your password is required"],
   },
+  role: {
+    type: String,
+    enum: ["User", "Admin"],
+    default: "User",
+  },
+  riskProfile: {
+    type: String,
+    enum: ["Conservative", "Moderate", "Aggressive"],
+    default: "Moderate",
+  },
+  balance: {
+    type: Number,
+    default: 100000.00,
+  },
+  mobile: {
+    type: String,
+  },
+  pan: {
+    type: String,
+  },
+  dob: {
+    type: String,
+  },
+  bankAccount: {
+    type: String,
+  },
+  ifsc: {
+    type: String,
+  },
+  aadhaar: {
+    type: String,
+  },
+  ipvVerified: {
+    type: Boolean,
+    default: false,
+  },
+  eSignCompleted: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
-    default: new Date(),
+    default: () => new Date(),
   },
 });
 

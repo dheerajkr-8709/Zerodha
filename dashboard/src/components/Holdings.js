@@ -11,6 +11,8 @@ const Holdings = () => {
     axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"}/allHoldings`).then((res) => {
       // console.log(res.data);
       setAllHoldings(res.data);
+    }).catch((err) => {
+      console.error("Error fetching holdings:", err);
     });
   }, []);
 

@@ -17,12 +17,12 @@ const OrderActionWindow = ({ uid, mode }) => {
         mode: mode,
       });
 
-      alert(response.data || "Order placed successfully!");
+      alert(response.data?.message || "Order placed successfully!");
       closeOrderWindow();
       // Optional: Refresh the page to show updated balances
       window.location.reload(); 
     } catch (error) {
-      const errorMsg = error.response?.data || "Failed to place order. Please try again.";
+      const errorMsg = error.response?.data?.message || error.response?.data || "Failed to place order. Please try again.";
       alert("Trade Error: " + errorMsg);
       // Don't close window on error so user can correct qty/price
     }

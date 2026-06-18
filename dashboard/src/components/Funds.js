@@ -3,21 +3,26 @@ import axios from "axios";
 
 const Funds = () => {
   const [ordersData, setOrdersData] = useState([]);
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchFundsData = async () => {
       try {
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
-        const res = await axios.get(`${backendUrl}/allOrders`);
-        setOrdersData(res.data);
+        const [ordersRes, meRes] = await Promise.all([
+          axios.get(`${backendUrl}/allOrders`),
+          axios.get(`${backendUrl}/me`).catch(() => ({ data: { user: null } }))
+        ]);
+        setOrdersData(ordersRes.data);
+        setUser(meRes.data?.user);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching orders for funds:", error);
+        console.error("Error fetching funds data:", error);
         setIsLoading(false);
       }
     };
-    fetchOrders();
+    fetchFundsData();
   }, []);
 
   const handleAddFunds = () => {
@@ -34,8 +39,8 @@ const Funds = () => {
 
   // Dynamic calculations (matching Summary logic)
   const OPENING_BALANCE = 100000;
-  const totalUsedMargin = ordersData.reduce((acc, order) => acc + (order.price * order.qty), 0);
-  const availableMargin = OPENING_BALANCE - totalUsedMargin;
+  const availableMargin = user && user.balance !== undefined ? user.balance : OPENING_BALANCE;
+  const totalUsedMargin = Number((OPENING_BALANCE - availableMargin).toFixed(2));
 
   const formatCurrency = (val) => {
     return new Intl.NumberFormat('en-IN', {

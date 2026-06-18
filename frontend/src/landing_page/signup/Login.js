@@ -69,7 +69,7 @@ function Login() {
               <a href={`http://localhost:3001/?username=${encodeURIComponent(username)}`} className="btn btn-link p-0">Click here if not redirected</a>
             </div>
           ) : (
-            <p className="text-muted fs-6 mb-4">Login to your Zerodha account to continue.</p>
+            <p className="text-muted fs-6 mb-4">Login to your ApexVest account to continue.</p>
           )}
           <form onSubmit={handleLogin}>
             <div className="mb-3">

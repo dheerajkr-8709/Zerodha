@@ -5,18 +5,21 @@ const Summary = () => {
   const username = localStorage.getItem("username") || "User";
   const [holdingsData, setHoldingsData] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
-        const [holdingsRes, ordersRes] = await Promise.all([
+        const [holdingsRes, ordersRes, meRes] = await Promise.all([
           axios.get(`${backendUrl}/allHoldings`),
-          axios.get(`${backendUrl}/allOrders`)
+          axios.get(`${backendUrl}/allOrders`),
+          axios.get(`${backendUrl}/me`).catch(() => ({ data: { user: null } }))
         ]);
         setHoldingsData(holdingsRes.data);
         setOrdersData(ordersRes.data);
+        setUser(meRes.data?.user);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching summary data:", error);
@@ -38,12 +41,8 @@ const Summary = () => {
   const totalPL = totalCurrentValue - totalInvestment;
   const plPercentage = totalInvestment > 0 ? ((totalPL / totalInvestment) * 100).toFixed(2) : 0;
 
-  const totalUsedMargin = ordersData.reduce((acc, order) => {
-    // Basic calculation for used margin based on orders
-    return acc + (order.price * order.qty);
-  }, 0);
-
-  const availableMargin = OPENING_BALANCE - totalUsedMargin;
+  const availableMargin = user && user.balance !== undefined ? user.balance : OPENING_BALANCE;
+  const totalUsedMargin = Number((OPENING_BALANCE - availableMargin).toFixed(2));
 
   const formatCurrency = (val) => {
     return new Intl.NumberFormat('en-IN', {

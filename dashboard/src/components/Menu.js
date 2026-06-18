@@ -32,7 +32,9 @@ const Menu = () => {
 
   return (
     <div className="menu-container">
-      <img src="logo.png" alt="Logo" style={{ width: "20px" }} />
+      <span style={{ fontWeight: "800", fontSize: "1.2rem", color: "#E04F2E", marginRight: "auto" }}>
+        Zero<span style={{ color: "#387ED1" }}>dha</span>
+      </span>
       <div className="menus">
         <ul>
           <li>
@@ -63,6 +65,16 @@ const Menu = () => {
           <li>
             <Link className="menu-link" to="/apps" onClick={() => handleMenuClick(6)}>
               <p className={selectedMenu === 6 ? "menu selected" : "menu"}>Apps</p>
+            </Link>
+          </li>
+          <li>
+            <Link className="menu-link" to="/wealth" onClick={() => handleMenuClick(7)}>
+              <p className={selectedMenu === 7 ? "menu selected" : "menu"}>Wealth Hub</p>
+            </Link>
+          </li>
+          <li>
+            <Link className="menu-link" to="/academy" onClick={() => handleMenuClick(8)}>
+              <p className={selectedMenu === 8 ? "menu selected" : "menu"}>Academy</p>
             </Link>
           </li>
         </ul>

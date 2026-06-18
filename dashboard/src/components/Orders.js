@@ -8,6 +8,8 @@ const Orders = () => {
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"}/allOrders`).then((res) => {
       setAllOrders(res.data);
+    }).catch((err) => {
+      console.error("Error fetching orders:", err);
     });
   }, []);
 

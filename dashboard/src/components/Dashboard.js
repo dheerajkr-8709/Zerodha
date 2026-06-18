@@ -10,6 +10,8 @@ import Positions from "./Positions";
 import Summary from "./Summary";
 import WatchList from "./WatchList";
 import { GeneralContextProvider } from "./GeneralContext";
+import WealthHub from "./WealthHub";
+import Academy from "./Academy";
 
 const Dashboard = () => {
   return (
@@ -25,6 +27,8 @@ const Dashboard = () => {
           <Route path="/positions" element={<Positions />} />
           <Route path="/funds" element={<Funds />} />
           <Route path="/apps" element={<Apps />} />
+          <Route path="/wealth" element={<WealthHub />} />
+          <Route path="/academy" element={<Academy />} />
         </Routes>
       </div>
     </div>
