@@ -19,7 +19,7 @@ const WealthHub = () => {
   const [newGoalTarget, setNewGoalTarget] = useState("");
   const [newGoalDate, setNewGoalDate] = useState("");
 
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://zerodha-backend-117g.onrender.com";
   const token = localStorage.getItem("token") || "";
 
   // Headers config

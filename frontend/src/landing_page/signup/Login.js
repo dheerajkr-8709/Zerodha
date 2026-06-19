@@ -12,7 +12,7 @@ function Login() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"}/login`, {
+      const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL || "https://zerodha-backend-117g.onrender.com"}/login`, {
         email,
         password,
       }, { withCredentials: true });

@@ -266,7 +266,7 @@ function Signup() {
       };
 
       const { data } = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"}/signup`, 
+        `${process.env.REACT_APP_BACKEND_URL || "https://zerodha-backend-117g.onrender.com"}/signup`, 
         payload
       );
 

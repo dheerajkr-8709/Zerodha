@@ -6,7 +6,7 @@ const Orders = () => {
   const [allOrders, setAllOrders] = useState([]);
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"}/allOrders`).then((res) => {
+    axios.get(`${process.env.REACT_APP_BACKEND_URL || "https://zerodha-backend-117g.onrender.com"}/allOrders`).then((res) => {
       setAllOrders(res.data);
     }).catch((err) => {
       console.error("Error fetching orders:", err);

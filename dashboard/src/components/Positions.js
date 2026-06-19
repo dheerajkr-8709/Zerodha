@@ -7,7 +7,7 @@ const Positions = () => {
   const [allPositions, setAllPositions] = useState([]);
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"}/allPositions`).then((res) => {
+    axios.get(`${process.env.REACT_APP_BACKEND_URL || "https://zerodha-backend-117g.onrender.com"}/allPositions`).then((res) => {
       setAllPositions(res.data);
     }).catch((err) => {
       console.error("Error fetching positions:", err);

@@ -9,7 +9,7 @@ const Funds = () => {
   useEffect(() => {
     const fetchFundsData = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://zerodha-backend-117g.onrender.com";
         const [ordersRes, meRes] = await Promise.all([
           axios.get(`${backendUrl}/allOrders`),
           axios.get(`${backendUrl}/me`).catch(() => ({ data: { user: null } }))

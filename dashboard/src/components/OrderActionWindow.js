@@ -10,7 +10,7 @@ const OrderActionWindow = ({ uid, mode }) => {
 
   const handleOrderClick = async () => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"}/newOrder`, {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL || "https://zerodha-backend-117g.onrender.com"}/newOrder`, {
         name: uid,
         qty: Number(stockQuantity),
         price: Number(stockPrice),
